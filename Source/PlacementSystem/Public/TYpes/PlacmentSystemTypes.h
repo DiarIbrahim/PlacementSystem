@@ -14,6 +14,19 @@ USTRUCT(BlueprintType)
 struct FPlacementData {
 	GENERATED_BODY()
 
+
+
+	// cpp only
+
+	/*
+		rotates the mesh after spawn around Z axis by this amount
+	*/
+	float Additional_Placement_time_Yaw = 0;
+
+
+
+	// exposed to BP
+
 	/*
 		the item needed to be placed
 	*/
@@ -26,20 +39,53 @@ struct FPlacementData {
 	bool bAlignToSurfaceNormal = true;
 
 	/*
-		the rotational offset to be applyed to the placement actor
-	*/
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FRotator RotationOffset;
-	
-	/*
 		the positional offset to be applyed to the placement actor
 	*/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FVector LocationOffset;
 
+	/*
+		whether to apply grid rule to location, the building can not be placed freely, it will snap to certain points based on grid settings
+	*/
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	bool bApplyGridRules = false;
+
+
 
 
 };
+
+
+/*
+	Settings used in grid proccessing
+*/
+USTRUCT(BlueprintType)
+struct FGridSettingsData {
+	GENERATED_BODY()
+
+	FGridSettingsData() {}
+
+	/*
+		size (x,y) of the grids ( in cm )
+	*/
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	double GridSize = 20;
+	
+	/*
+		whether to snap the location to the center of the cell rather than corner of the grid cell
+	*/
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	bool bSnapToGridCellCenter = false;
+
+	/*
+		whether to apply the grid or not 
+	*/
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	bool bApplyGrid = false;
+
+
+};
+
 
 
 

@@ -26,8 +26,18 @@ class PLACEMENTSYSTEM_API UPlacementManagerComponent : public UActorComponent
 	*/
 	struct FPlacementData CurrentPlacementData;
 
+	/*
+		settings for grid processing
+	*/
+	struct FGridSettingsData GridSettings;
+
 	// internal functions
+	
+	// returns player controller of this player
 	class APlayerController* GetPlayerController()const;
+	
+	// snaps the location acording to the grid settings
+	void ApplyGridSettings(FTransform& transform);
 
 
 protected:
@@ -45,15 +55,24 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+
 	UFUNCTION(BlueprintCallable)
-	bool GetUnderCursorTrans(FTransform& UnderCursorLoc) const;
+	void SetGridSettings(struct FGridSettingsData gridData);
+
+
+	/*
+		returns transform under the cursor 
+		applys grid rules acording to @GridSettings	
+	*/
+	UFUNCTION(BlueprintCallable)
+	bool GetUnderCursorTrans(FTransform& UnderCursorLoc);
+
+
 
 	/*
 		updates the spawned Placment mesh's location and rotation, this will be called when the placment started but not yet accepted or canceled !
 	*/
 	void UpdatePreviewMewsh(FTransform PlacementTransform);
-
-
 
 	/*
 		can be called to start placing the passed static mesh ( @mesh ) to the world !
@@ -73,6 +92,14 @@ public:
 	*/
 	UFUNCTION(BlueprintCallable)
 	void Placement_Accept();
+
+	/*
+		applys rotation around Z axis to the placement process, this will be applyed only if called after calling  Placement_Start() function
+		so please call it when you see the preview of the placement mesh
+
+	*/
+	UFUNCTION(BlueprintCallable)
+	void ApplyYawRotationToPlacement(float Yaw);
 
 
 };

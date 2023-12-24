@@ -46,6 +46,11 @@ void UPlacementManagerComponent::TickComponent(float DeltaTime, ELevelTick TickT
 
 }
 
+void UPlacementManagerComponent::SetGridSettings(FGridSettingsData newdata)
+{
+	GridSettings = newdata;
+}
+
 APlayerController* UPlacementManagerComponent::GetPlayerController() const
 {
 
@@ -58,13 +63,36 @@ APlayerController* UPlacementManagerComponent::GetPlayerController() const
 
 }
 
-bool UPlacementManagerComponent::GetUnderCursorTrans(FTransform& UnderCursorTrans) const
+void UPlacementManagerComponent::ApplyGridSettings(FTransform& transform)
+{
+	if (!GridSettings.bApplyGrid || !CurrentPlacementData.bApplyGridRules) return;
+
+	FVector location = transform.GetLocation();
+
+	int32 XCells = location.X / GridSettings.GridSize;
+	int32 YCells = location.Y / GridSettings.GridSize;
+
+	location.X = XCells * GridSettings.GridSize;
+	location.Y = YCells * GridSettings.GridSize;
+
+	if (GridSettings.bSnapToGridCellCenter) {
+		location.X += GridSettings.GridSize / 2.0f;
+		location.Y += GridSettings.GridSize / 2.0f;
+	}
+
+	transform.SetLocation(location);
+
+}
+
+bool UPlacementManagerComponent::GetUnderCursorTrans(FTransform& UnderCursorTrans) 
 {
 	if (GetPlayerController()) {
 		FHitResult h;
 		if (GetPlayerController()->GetHitResultUnderCursor(ECC_Visibility, 0, h)) {
 			UnderCursorTrans.SetLocation(h.ImpactPoint);
-			
+
+			ApplyGridSettings(UnderCursorTrans);
+
 			if (CurrentPlacementData.bAlignToSurfaceNormal) {
 				UnderCursorTrans.SetRotation(UKismetMathLibrary::MakeRotFromZ(h.ImpactNormal).Quaternion());
 			}
@@ -82,13 +110,13 @@ bool UPlacementManagerComponent::GetUnderCursorTrans(FTransform& UnderCursorTran
 void UPlacementManagerComponent::UpdatePreviewMewsh(FTransform PlacementTransform)
 {
 	// already spawned  just re possition it
-	if (_previewPlacement) {
+	if (_previewPlacement && bstartPlacing) {
 
 		// apply offset befor updating location and rotation
 		PlacementTransform.SetLocation(PlacementTransform.GetLocation() + CurrentPlacementData.LocationOffset);
-		//PlacementTransform.SetRotation(PlacementTransform.GetRotation() + CurrentPlacementData.RotationOffset.Quaternion());
-		
-		
+		FRotator rot = PlacementTransform.GetRotation().Rotator();
+		rot.Yaw += CurrentPlacementData.Additional_Placement_time_Yaw;
+		PlacementTransform.SetRotation(rot.Quaternion());
 		_previewPlacement->SetActorTransform(PlacementTransform);
 	}
 }
@@ -111,8 +139,12 @@ void UPlacementManagerComponent::Placement_Accept()
 
 }
 
+
 void UPlacementManagerComponent::Placement_Start(FPlacementData data)
 {
+	if (bstartPlacing) return;
+
+
 	CurrentPlacementData = data;
 	if (!_previewPlacement) {
 		if (_previewPlacement = GetWorld()->SpawnActor<APlacementActor>(data.ActorToPlace)) {
@@ -122,3 +154,10 @@ void UPlacementManagerComponent::Placement_Start(FPlacementData data)
 }
 
 
+
+void UPlacementManagerComponent::ApplyYawRotationToPlacement(float Yaw)
+{
+	if (!bstartPlacing) return;
+
+	CurrentPlacementData.Additional_Placement_time_Yaw += Yaw;
+}
