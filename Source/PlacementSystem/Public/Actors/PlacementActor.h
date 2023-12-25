@@ -94,6 +94,7 @@ public:
 		if accpted, allows this placement actor to be moved ( snapped to mouse cursor ) and placed else where
 		returns true if accepted and false if declined
 	*/
+	UFUNCTION(BlueprintCallable)
 	bool RegisterForReplacement();
 
 	/*
@@ -124,6 +125,18 @@ public:
 	*/
 	UFUNCTION(BlueprintImplementableEvent, META = (DisplayName = "OnSelected"))
 	void OnSelected_BP();
+
+
+	/*
+		called when this actor replaced by PlacemenManagerComponent
+	*/
+	void OnReplaced();
+	/*
+		called when this actor replaced by PlacemenManagerComponent
+		can be Implemented on Blueprint
+	*/
+	UFUNCTION(BlueprintImplementableEvent, META = (DisplayName = "OnReplaced"))
+	void OnReplaced_BP();
 
 
 

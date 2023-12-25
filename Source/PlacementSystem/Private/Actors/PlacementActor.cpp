@@ -75,20 +75,29 @@ void APlacementActor::AnimateHover(float DeltaTime)
 bool APlacementActor::RegisterForReplacement()
 {
 	if (PlacementComponent)
-		return PlacementComponent->RegisterBuildingForRePlacement(this);
+		return PlacementComponent->Replacement_Start(this);
 	else return false;
 }
 
 void APlacementActor::OnPlaced(UPlacementManagerComponent* PlacementComponentRef)
 {
-	ensure(PlacementComponentRef, "Error APlacementActor::OnPlaced PlacementSystem Component reference is Invalid !");
+	ensureMsgf(PlacementComponentRef, TEXT("Error APlacementActor::OnPlaced PlacementSystem Component reference is Invalid !"));
 	PlacementComponent = PlacementComponentRef;
 	OnPlaced_BP();
 }
 
 void APlacementActor::OnSelected()
 {
+	if (bIsSelected) return;
+
+	bIsSelected = true;
 	OnSelected_BP();
+}
+
+void APlacementActor::OnReplaced()
+{
+	bIsSelected = false;
+	OnReplaced_BP();
 }
 
 void APlacementActor::OnHovered()

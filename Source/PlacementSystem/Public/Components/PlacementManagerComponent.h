@@ -57,7 +57,13 @@ protected:
 
 	//UPROPERTY(BlueprintReadWrite , EditAnywhere , Category = "Placement System | ")
 
+	// is started placing buildings
 	bool bstartPlacing = false;
+	// is has a selected building to replace
+	bool bIsReplacing = false;
+	// the selected builing for replacing, the transform befor starting to treplace
+	FTransform _Pre_Replace_Selected_Transform;
+
 
 public:	
 	// Sets default values for this component's properties
@@ -83,6 +89,13 @@ public:
 		updates the spawned Placment mesh's location and rotation, this will be called when the placment started but not yet accepted or canceled !
 	*/
 	void UpdatePreviewMewsh(FTransform PlacementTransform);
+
+
+	/*
+		updates the a selected buildings location and rotation,!
+	*/
+	void UpdateSelectedForReplacement(FTransform PlacementTransform);
+
 
 	/*
 		can be called to start placing the passed static mesh ( @mesh ) to the world !
@@ -115,13 +128,33 @@ public:
 		check the location under the cursor for classes of type APlacementActor
 		and and selectes it !
 	*/
-	UFUNCTION(BlueprintCallable)
 	bool CheckUnderCursorForSelection();
 
 	/*
-		
+		selects currently hovered item (Of Type PlacementActor)
 	*/
-	bool RegisterBuildingForReplacement(class APlacementActor* building);
+	UFUNCTION(BlueprintCallable)
+	void SelectUnderCursor();
+
+		
+	/*
+		to start replacing an already placed/spawned building
+	*/
+	UFUNCTION(BlueprintCallable)
+	bool Replacement_Start(class APlacementActor* building);
+
+	/*
+		to accept the replacement process and place the currently selected building in proper position
+	*/
+	UFUNCTION(BlueprintCallable)
+	void Replacement_Accept();
+
+	/*
+		to reject the replacement process and place the currently selected building to its original transform
+	*/
+	UFUNCTION(BlueprintCallable)
+	void Replacement_Cancel();
+
 
 };
 

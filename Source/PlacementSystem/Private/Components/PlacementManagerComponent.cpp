@@ -42,6 +42,13 @@ void UPlacementManagerComponent::TickComponent(float DeltaTime, ELevelTick TickT
 			UpdatePreviewMewsh(transform);
 		}
 	}
+	else if (bIsReplacing) {
+		FTransform transform;
+		if (GetUnderCursorTrans(transform)) {
+			UpdateSelectedForReplacement(transform);
+		}
+
+	}
 	else {
 		// track under the mouse 
 		CheckUnderCursorForSelection();
@@ -122,6 +129,13 @@ void UPlacementManagerComponent::UpdatePreviewMewsh(FTransform PlacementTransfor
 		rot.Yaw += CurrentPlacementData.Additional_Placement_time_Yaw;
 		PlacementTransform.SetRotation(rot.Quaternion());
 		_previewPlacement->SetActorTransform(PlacementTransform);
+	}
+}
+
+void UPlacementManagerComponent::UpdateSelectedForReplacement(FTransform PlacementTransform)
+{
+	if (_SelectedPlacement && bIsReplacing) {
+		_SelectedPlacement->SetActorTransform(PlacementTransform);
 	}
 }
 
@@ -206,9 +220,42 @@ bool UPlacementManagerComponent::CheckUnderCursorForSelection()
 	return false;
 }
 
-bool UPlacementManagerComponent::RegisterBuildingForReplacement(APlacementActor* building)
+void UPlacementManagerComponent::SelectUnderCursor()
 {
-	if (bstartPlacing) return false;
-
-	return false;
+	if (_HoveredPlacement && !bstartPlacing) {
+		_HoveredPlacement->OnSelected();
+	}
 }
+
+
+
+bool UPlacementManagerComponent::Replacement_Start(APlacementActor* building)
+{
+	if (bIsReplacing || bstartPlacing || !building) return false;
+
+	_Pre_Replace_Selected_Transform = building->GetActorTransform();
+	bIsReplacing = true;
+	_SelectedPlacement = building;
+
+	return true;
+}
+
+void UPlacementManagerComponent::Replacement_Accept()
+{
+	if (!bIsReplacing) return;
+
+	bIsReplacing = false;
+	_SelectedPlacement->OnReplaced();
+	_SelectedPlacement = nullptr;
+}
+
+void UPlacementManagerComponent::Replacement_Cancel()
+{
+	if (!bIsReplacing) return;
+
+	bIsReplacing = false;
+	_SelectedPlacement->SetActorTransform(_Pre_Replace_Selected_Transform);
+	_SelectedPlacement->OnReplaced();
+	_SelectedPlacement = nullptr;
+}
+
