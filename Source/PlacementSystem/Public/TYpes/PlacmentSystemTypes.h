@@ -24,11 +24,10 @@ struct FPlacementData {
 	float Additional_Placement_time_Yaw = 0;
 
 
-
 	// exposed to BP
 
 	/*
-		the item needed to be placed
+		the item needed to be placed in the world 
 	*/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<APlacementActor> ActorToPlace;
@@ -48,9 +47,7 @@ struct FPlacementData {
 		whether to apply grid rule to location, the building can not be placed freely, it will snap to certain points based on grid settings
 	*/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	bool bApplyGridRules = false;
-
-
+	bool bApplyGridRules = true;
 
 
 };
@@ -81,13 +78,10 @@ struct FGridSettingsData {
 		whether to apply the grid or not 
 	*/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	bool bApplyGrid = false;
+	bool bApplyGrid = true;
 
 
 };
-
-
-
 
 UCLASS()
 class PLACEMENTSYSTEM_API UPlacmentSystemTypes : public UObject

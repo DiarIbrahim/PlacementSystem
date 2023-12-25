@@ -42,6 +42,10 @@ void UPlacementManagerComponent::TickComponent(float DeltaTime, ELevelTick TickT
 			UpdatePreviewMewsh(transform);
 		}
 	}
+	else {
+		// track under the mouse 
+		CheckUnderCursorForSelection();
+	}
 	
 
 }
@@ -134,6 +138,7 @@ void UPlacementManagerComponent::Placement_Accept()
 {
 	bstartPlacing = false;
 	if (_previewPlacement) {
+		_previewPlacement->OnPlaced(this);
 		_previewPlacement = nullptr;
 	}
 
@@ -148,6 +153,7 @@ void UPlacementManagerComponent::Placement_Start(FPlacementData data)
 	CurrentPlacementData = data;
 	if (!_previewPlacement) {
 		if (_previewPlacement = GetWorld()->SpawnActor<APlacementActor>(data.ActorToPlace)) {
+			_previewPlacement->OnPreviewPlacement();
 			bstartPlacing = true;
 		}
 	}
@@ -160,4 +166,49 @@ void UPlacementManagerComponent::ApplyYawRotationToPlacement(float Yaw)
 	if (!bstartPlacing) return;
 
 	CurrentPlacementData.Additional_Placement_time_Yaw += Yaw;
+}
+
+bool UPlacementManagerComponent::CheckUnderCursorForSelection()
+{
+	if (!GetPlayerController()) return false;
+
+	FHitResult h;
+	if (GetPlayerController()->GetHitResultUnderCursor(ECC_WorldStatic, 0, h)) {
+		
+		if (APlacementActor* hitted = Cast<APlacementActor>(h.GetActor())) {
+		
+			// hover when there is no hovered building
+			if (!_HoveredPlacement) {
+				_HoveredPlacement = hitted;
+				_HoveredPlacement->OnHovered();
+			
+			}
+			// when there is already hovered building and hovered a new one 
+			else if (_HoveredPlacement && _HoveredPlacement != hitted) {
+				_HoveredPlacement->OnUnHovered();
+				_HoveredPlacement = hitted;
+				_HoveredPlacement->OnHovered();
+			}
+
+		}
+		else {
+			// unhover the already hovered placement buildings
+			if (_HoveredPlacement) {
+				_HoveredPlacement->OnUnHovered();
+				_HoveredPlacement = nullptr;
+			}
+
+		}
+
+	}
+
+
+	return false;
+}
+
+bool UPlacementManagerComponent::RegisterBuildingForReplacement(APlacementActor* building)
+{
+	if (bstartPlacing) return false;
+
+	return false;
 }

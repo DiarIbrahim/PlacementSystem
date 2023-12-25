@@ -21,6 +21,17 @@ class PLACEMENTSYSTEM_API UPlacementManagerComponent : public UActorComponent
 		the placement actor spawned to the world as preview and its placement not yet been accepted
 	*/
 	class APlacementActor* _previewPlacement;
+	
+	/*
+		the placement actor spawned to the world as preview and its placement not yet been accepted	
+	*/
+	class APlacementActor* _HoveredPlacement;
+
+	/*
+		the placement actor spawned to the world as preview and its placement not yet been accepted
+	*/
+	class APlacementActor* _SelectedPlacement;
+
 	/*
 		the current(last) data used for placement
 	*/
@@ -68,7 +79,6 @@ public:
 	bool GetUnderCursorTrans(FTransform& UnderCursorLoc);
 
 
-
 	/*
 		updates the spawned Placment mesh's location and rotation, this will be called when the placment started but not yet accepted or canceled !
 	*/
@@ -101,5 +111,17 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ApplyYawRotationToPlacement(float Yaw);
 
+	/*
+		check the location under the cursor for classes of type APlacementActor
+		and and selectes it !
+	*/
+	UFUNCTION(BlueprintCallable)
+	bool CheckUnderCursorForSelection();
+
+	/*
+		
+	*/
+	bool RegisterBuildingForReplacement(class APlacementActor* building);
 
 };
+
