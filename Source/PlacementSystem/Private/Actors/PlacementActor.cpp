@@ -5,6 +5,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/PlacementManagerComponent.h"
 #include "placementSystem.h"
+#include "Components/GridManager.h"
 
 // Sets default values
 APlacementActor::APlacementActor()
@@ -23,6 +24,41 @@ APlacementActor::APlacementActor()
 		collision->SetupAttachment(root);
 	}
 
+
+}
+
+
+void Helper_DrawCellGizmo_DrawCell(UWorld* world , FVector Cell_StartPoint , float cell_size) {
+	if (!world)return;
+
+	TArray<FVector> Points = { Cell_StartPoint , 
+					   Cell_StartPoint+ FVector(cell_size,0,0),
+					   Cell_StartPoint + FVector(cell_size,cell_size,0), 
+					   Cell_StartPoint + FVector(0,cell_size,0), };
+
+	DrawDebugLine(world , Points[0] , Points[1] , FColor::Green ,1,-1,0U,2);
+	DrawDebugLine(world, Points[1], Points[2], FColor::Green, 1, -1, 0U, 2);
+	DrawDebugLine(world, Points[2], Points[3], FColor::Green, 1, -1, 0U, 2);
+	DrawDebugLine(world, Points[3], Points[0], FColor::Green, 1, -1, 0U, 2);
+
+
+}
+
+void APlacementActor::DrawCellGizmo()
+{
+	GetWorld()->Exec(GetWorld(), TEXT("FlushPersistentDebugLines"));
+	for (size_t i = 0; i < width_Cell; i++) {
+		for (size_t j = 0; j < depth_Cell; j++) {
+			FVector startLoc = FVector(cell_size * i, cell_size * j, 0);
+			Helper_DrawCellGizmo_DrawCell(GetWorld() ,startLoc ,cell_size);
+		}
+	}
+}
+
+void APlacementActor::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+	DrawCellGizmo();
 }
 
 // Called when the game starts or when spawned
@@ -66,10 +102,9 @@ void APlacementActor::AnimateHover(float DeltaTime)
 		else {
 			currentScale = FMath::Clamp(currentScale, hoveredScale , normalScale);
 		}
-		
+		// set
 		SetActorScale3D(FVector(currentScale));
 	}
-
 }
 
 bool APlacementActor::RegisterForReplacement()
@@ -83,6 +118,8 @@ void APlacementActor::OnPlaced(UPlacementManagerComponent* PlacementComponentRef
 {
 	ensureMsgf(PlacementComponentRef, TEXT("Error APlacementActor::OnPlaced PlacementSystem Component reference is Invalid !"));
 	PlacementComponent = PlacementComponentRef;
+	BuildingId = FGuid::NewGuid();
+	bFirstTimeToPlace = false;
 	OnPlaced_BP();
 }
 

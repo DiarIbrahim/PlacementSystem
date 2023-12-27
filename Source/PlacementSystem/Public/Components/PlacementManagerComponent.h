@@ -21,7 +21,7 @@ class PLACEMENTSYSTEM_API UPlacementManagerComponent : public UActorComponent
 		the placement actor spawned to the world as preview and its placement not yet been accepted
 	*/
 	class APlacementActor* _previewPlacement;
-	
+
 	/*
 		the placement actor spawned to the world as preview and its placement not yet been accepted	
 	*/
@@ -37,21 +37,27 @@ class PLACEMENTSYSTEM_API UPlacementManagerComponent : public UActorComponent
 	*/
 	struct FPlacementData CurrentPlacementData;
 
+protected:
+	/*
+		the placement actor spawned to the world as preview and its placement not yet been accepted
+	*/
+	class AGridManager* _GridManager;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Placement Component | Grid")
+	TSubclassOf<class AGridManager>CustomGridClass;
+
+	
 	/*
 		settings for grid processing
 	*/
+	UPROPERTY(BlueprintReadWrite , EditAnywhere , Category = "Placement Component | Grid")
 	struct FGridSettingsData GridSettings;
 
 	// internal functions
 	
 	// returns player controller of this player
 	class APlayerController* GetPlayerController()const;
-	
-	// snaps the location acording to the grid settings
-	void ApplyGridSettings(FTransform& transform);
 
-
-protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
@@ -71,11 +77,6 @@ public:
 
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-
-	UFUNCTION(BlueprintCallable)
-	void SetGridSettings(struct FGridSettingsData gridData);
-
 
 	/*
 		returns transform under the cursor 

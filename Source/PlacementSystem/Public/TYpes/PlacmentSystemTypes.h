@@ -66,7 +66,7 @@ struct FGridSettingsData {
 		size (x,y) of the grids ( in cm )
 	*/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	double GridSize = 20;
+	double GridSize = 100;
 	
 	/*
 		whether to snap the location to the center of the cell rather than corner of the grid cell

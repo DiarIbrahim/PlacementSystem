@@ -5,9 +5,8 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "Actors/PlacementActor.h"
+#include "Components/GridManager.h"
 #include "PlacementSystem.h"
-
-
 
 
 
@@ -27,7 +26,17 @@ void UPlacementManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UpdatePreviewMewsh(FTransform());
+	if (GridSettings.bApplyGrid) {
+		if (CustomGridClass) {
+			_GridManager = GetWorld()->SpawnActor<AGridManager>(CustomGridClass);
+		}
+		else {
+			_GridManager = GetWorld()->SpawnActor<AGridManager>();
+		}
+		_GridManager->Init(this);
+		_GridManager->SetGridSettingsData(GridSettings);
+	}
+
 }
 
 
@@ -40,12 +49,14 @@ void UPlacementManagerComponent::TickComponent(float DeltaTime, ELevelTick TickT
 		FTransform transform;
 		if (GetUnderCursorTrans(transform)) {
 			UpdatePreviewMewsh(transform);
+			_GridManager->RedrawPlacementCells(_previewPlacement);
 		}
 	}
 	else if (bIsReplacing) {
 		FTransform transform;
 		if (GetUnderCursorTrans(transform)) {
 			UpdateSelectedForReplacement(transform);
+			_GridManager->RedrawPlacementCells(_SelectedPlacement);
 		}
 
 	}
@@ -55,11 +66,6 @@ void UPlacementManagerComponent::TickComponent(float DeltaTime, ELevelTick TickT
 	}
 	
 
-}
-
-void UPlacementManagerComponent::SetGridSettings(FGridSettingsData newdata)
-{
-	GridSettings = newdata;
 }
 
 APlayerController* UPlacementManagerComponent::GetPlayerController() const
@@ -74,26 +80,6 @@ APlayerController* UPlacementManagerComponent::GetPlayerController() const
 
 }
 
-void UPlacementManagerComponent::ApplyGridSettings(FTransform& transform)
-{
-	if (!GridSettings.bApplyGrid || !CurrentPlacementData.bApplyGridRules) return;
-
-	FVector location = transform.GetLocation();
-
-	int32 XCells = location.X / GridSettings.GridSize;
-	int32 YCells = location.Y / GridSettings.GridSize;
-
-	location.X = XCells * GridSettings.GridSize;
-	location.Y = YCells * GridSettings.GridSize;
-
-	if (GridSettings.bSnapToGridCellCenter) {
-		location.X += GridSettings.GridSize / 2.0f;
-		location.Y += GridSettings.GridSize / 2.0f;
-	}
-
-	transform.SetLocation(location);
-
-}
 
 bool UPlacementManagerComponent::GetUnderCursorTrans(FTransform& UnderCursorTrans) 
 {
@@ -102,10 +88,10 @@ bool UPlacementManagerComponent::GetUnderCursorTrans(FTransform& UnderCursorTran
 		if (GetPlayerController()->GetHitResultUnderCursor(ECC_Visibility, 0, h)) {
 			UnderCursorTrans.SetLocation(h.ImpactPoint);
 
-			ApplyGridSettings(UnderCursorTrans);
+			_GridManager->ApplyGridSettings(UnderCursorTrans);
 
 			if (CurrentPlacementData.bAlignToSurfaceNormal) {
-				UnderCursorTrans.SetRotation(UKismetMathLibrary::MakeRotFromZ(h.ImpactNormal).Quaternion());
+				UnderCursorTrans.SetRotation(UKismetMathLibrary::MakeRotFromZX(h.ImpactNormal , FVector::ForwardVector).Quaternion());
 			}
 			else {
 				UnderCursorTrans.SetRotation(FQuat::Identity);
@@ -127,8 +113,19 @@ void UPlacementManagerComponent::UpdatePreviewMewsh(FTransform PlacementTransfor
 		PlacementTransform.SetLocation(PlacementTransform.GetLocation() + CurrentPlacementData.LocationOffset);
 		FRotator rot = PlacementTransform.GetRotation().Rotator();
 		rot.Yaw += CurrentPlacementData.Additional_Placement_time_Yaw;
-		PlacementTransform.SetRotation(rot.Quaternion());
+		 PlacementTransform.SetRotation(rot.Quaternion());
 		_previewPlacement->SetActorTransform(PlacementTransform);
+
+		if (_GridManager && _previewPlacement) {
+			if (_GridManager->CanAddBuildingToGrid(_previewPlacement)) {
+				Print("Yes Can add !" , 12121);
+			}
+			else {
+				Print("NO Can't add !", 12121);
+
+			}
+		}
+
 	}
 }
 
@@ -138,27 +135,6 @@ void UPlacementManagerComponent::UpdateSelectedForReplacement(FTransform Placeme
 		_SelectedPlacement->SetActorTransform(PlacementTransform);
 	}
 }
-
-void UPlacementManagerComponent::Placement_Cancel()
-{
-	bstartPlacing = false;
-
-	if (_previewPlacement) {
-		_previewPlacement->Destroy();
-	}
-}
-
-void UPlacementManagerComponent::Placement_Accept()
-{
-	bstartPlacing = false;
-	if (_previewPlacement) {
-		_previewPlacement->OnPlaced(this);
-		_previewPlacement = nullptr;
-	}
-
-}
-
-
 void UPlacementManagerComponent::Placement_Start(FPlacementData data)
 {
 	if (bstartPlacing) return;
@@ -172,6 +148,38 @@ void UPlacementManagerComponent::Placement_Start(FPlacementData data)
 		}
 	}
 }
+
+void UPlacementManagerComponent::Placement_Accept()
+{
+	if (!bstartPlacing || !_GridManager || !_GridManager->CanAddBuildingToGrid(_previewPlacement)) {
+		Print("failed to accept !");
+		Placement_Cancel();
+		return;
+	}
+
+	bstartPlacing = false;
+	if (_previewPlacement) {
+		_previewPlacement->OnPlaced(this);
+		_GridManager->AddBuildingToGrid(_previewPlacement);
+		_GridManager->ClearDrawing();
+		_previewPlacement = nullptr;
+	}
+
+}
+
+void UPlacementManagerComponent::Placement_Cancel()
+{
+	if (!bstartPlacing) return;
+	bstartPlacing = false;
+
+	if (_previewPlacement) {
+		_previewPlacement->Destroy(); 
+		_GridManager->ClearDrawing();
+		_previewPlacement = nullptr;
+	}
+}
+
+
 
 
 
@@ -222,7 +230,7 @@ bool UPlacementManagerComponent::CheckUnderCursorForSelection()
 
 void UPlacementManagerComponent::SelectUnderCursor()
 {
-	if (_HoveredPlacement && !bstartPlacing) {
+	if (_HoveredPlacement && !bstartPlacing && !bIsReplacing) {
 		_HoveredPlacement->OnSelected();
 	}
 }
@@ -242,11 +250,17 @@ bool UPlacementManagerComponent::Replacement_Start(APlacementActor* building)
 
 void UPlacementManagerComponent::Replacement_Accept()
 {
-	if (!bIsReplacing) return;
+	if (!bIsReplacing || !_GridManager || !_GridManager->CanAddBuildingToGrid(_SelectedPlacement)) {
+		Replacement_Cancel();
+		return;
+	}
 
 	bIsReplacing = false;
 	_SelectedPlacement->OnReplaced();
+	_GridManager->ReplaceBuilding(_SelectedPlacement);
+	_GridManager->ClearDrawing();
 	_SelectedPlacement = nullptr;
+
 }
 
 void UPlacementManagerComponent::Replacement_Cancel()
@@ -256,6 +270,8 @@ void UPlacementManagerComponent::Replacement_Cancel()
 	bIsReplacing = false;
 	_SelectedPlacement->SetActorTransform(_Pre_Replace_Selected_Transform);
 	_SelectedPlacement->OnReplaced();
+	_GridManager->ClearDrawing();
 	_SelectedPlacement = nullptr;
+
 }
 
