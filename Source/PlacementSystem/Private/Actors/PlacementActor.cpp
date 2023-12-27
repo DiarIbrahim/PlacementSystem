@@ -56,7 +56,7 @@ void APlacementActor::DrawCellGizmo()
 
 	for (size_t i = 0; i < width_Cell; i++) {
 		for (size_t j = 0; j < depth_Cell; j++) {
-			FVector startLoc = FVector(cell_size * i, cell_size * j, 0);
+			FVector startLoc = GetActorLocation() +  FVector(cell_size * i, cell_size * j, 0);
 			Helper_DrawCellGizmo_DrawCell(GetWorld() ,startLoc ,cell_size);
 		}
 	}
@@ -116,9 +116,14 @@ void APlacementActor::AnimateHover(float DeltaTime)
 
 bool APlacementActor::RegisterForReplacement()
 {
-	if (PlacementComponent)
+	if (PlacementComponent && bIsSelected)
 		return PlacementComponent->Replacement_Start(this);
 	else return false;
+}
+
+void APlacementActor::RemoveBuilding()
+{
+	PlacementComponent->RemoveBuilding(this);
 }
 
 void APlacementActor::OnPlaced(UPlacementManagerComponent* PlacementComponentRef)
@@ -136,6 +141,19 @@ void APlacementActor::OnSelected()
 
 	bIsSelected = true;
 	OnSelected_BP();
+}
+
+void APlacementActor::OnUnSelected()
+{
+	if (!bIsSelected) return;
+	bIsSelected = false;
+	OnUnSelected_BP();
+}
+
+void APlacementActor::OnReplace_Started()
+{
+	if (!bIsSelected) return;
+	OnReplace_Started_BP();
 }
 
 void APlacementActor::OnReplaced()

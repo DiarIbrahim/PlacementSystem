@@ -83,11 +83,10 @@ bool AGridManager::CanAddBuildingToGrid(APlacementActor* actorToPlace) const
 	return true;
 }
 
-FGridCell AGridManager::LocationToCell(APlacementActor* actorToPlace)
+FGridCell AGridManager::LocationToCell(FVector Location)
 {
-	FVector location = actorToPlace->GetActorLocation();
-	int32 XCells = location.X / _gridSettings.GridSize;
-	int32 YCells = location.Y / _gridSettings.GridSize;
+	int32 XCells = Location.X / _gridSettings.GridSize;
+	int32 YCells = Location.Y / _gridSettings.GridSize;
 	return FGridCell(XCells,YCells);
 }
 
@@ -99,7 +98,7 @@ bool AGridManager::AddBuildingToGrid(APlacementActor* ToPlace)
 	if (CanAddBuildingToGrid(ToPlace)) {
 		TArray<FGridCell> neededcells = GetCellsNeededForBuilding(ToPlace);
 		ToPlace->SetReserverCells(neededcells);
-		for (FGridCell c : neededcells) {
+		for (FGridCell& c : neededcells) {
 			c.Reserve(ToPlace->GetBuildingId());
 			reservedCells.Add(c);
 		}
@@ -132,14 +131,27 @@ void AGridManager::ReplaceBuilding(APlacementActor* ToPlace)
 
 }
 
+void AGridManager::OnBuildingRemoved(APlacementActor* ToRemove)
+{
+	// free reserved cells
+	for (size_t i = 0; i < ToRemove->GetReservedCells().Num(); i++) {
+		for (int j = 0; j < reservedCells.Num(); j++) {
+			if (reservedCells[j].IsEqual(ToRemove->GetReservedCells()[i])) {
+				reservedCells.RemoveAt(j);
+				break;
+			}
+		}
+	}
+}
+
 
 FGridCell LastdrawnLocation;
 void AGridManager::RedrawPlacementCells(APlacementActor* toPlace)
 {
 
 	// check if this building in this particular location is already drawn preview cells !
-	if (LocationToCell(toPlace).IsEqual(LastdrawnLocation) && toPlace->GetBuildingId() == LastdrawnLocation.reserverBuildingId) return;
-	LastdrawnLocation = LocationToCell(toPlace);
+	if (LocationToCell(toPlace->GetActorLocation()).IsEqual(LastdrawnLocation) && toPlace->GetBuildingId() == LastdrawnLocation.reserverBuildingId) return;
+	LastdrawnLocation = LocationToCell(toPlace->GetActorLocation());
 	LastdrawnLocation.reserverBuildingId = toPlace->GetBuildingId();
 	
 	ClearCellDrawing(0);
@@ -200,9 +212,9 @@ struct DrawData {
 	}
 };
 
-void AGridManager::DrawCells(TArray<FGridCell> cells , int meshIndex , float Padding , UMaterialInterface* CustomCellDrawMaterial)
+void AGridManager::DrawCells(TArray<FGridCell> cells , int meshIndex , float Padding , UMaterialInterface* CustomCellDrawMaterial , FVector offset)
 {
-	DrawData d = DrawData::MakeSetOfCells(cells, _gridSettings.GridSize, FVector(0, 0, 70), Padding);
+	DrawData d = DrawData::MakeSetOfCells(cells, _gridSettings.GridSize, offset, Padding);
 
 	if (ProceduralMesh) {
 		ProceduralMesh->CreateMeshSection(meshIndex, d.vectors, d.tringles, TArray<FVector>(), TArray<FVector2D>(), TArray<FColor>(), TArray<FProcMeshTangent>(), 0);

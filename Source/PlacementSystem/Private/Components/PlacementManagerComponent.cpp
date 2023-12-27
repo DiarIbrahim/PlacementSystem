@@ -226,12 +226,29 @@ bool UPlacementManagerComponent::CheckUnderCursorForSelection()
 }
 
 void UPlacementManagerComponent::SelectUnderCursor()
-{
-	if (_HoveredPlacement && !bstartPlacing && !bIsReplacing) {
-		_HoveredPlacement->OnSelected();
-	}
-}
+{               
+	//   placing new  OR   replacing  OR                clicking already slected building              
+	if (bstartPlacing || bIsReplacing || (_HoveredPlacement && _SelectedPlacement == _HoveredPlacement)) return;
 
+
+	if (_HoveredPlacement ) {
+		
+		// if already seleced, just unselect
+		if (_SelectedPlacement) {
+			_SelectedPlacement->OnUnSelected();
+			_SelectedPlacement = nullptr;
+		}
+		// selct newOne 
+		_SelectedPlacement = _HoveredPlacement;
+		_SelectedPlacement->OnSelected();
+
+	}
+	else if (_SelectedPlacement){
+		_SelectedPlacement->OnUnSelected();
+		_SelectedPlacement = nullptr;
+	}
+	
+}
 
 
 bool UPlacementManagerComponent::Replacement_Start(APlacementActor* building)
@@ -241,7 +258,7 @@ bool UPlacementManagerComponent::Replacement_Start(APlacementActor* building)
 	_Pre_Replace_Selected_Transform = building->GetActorTransform();
 	bIsReplacing = true;
 	_SelectedPlacement = building;
-
+	_SelectedPlacement->OnReplace_Started();
 	return true;
 }
 
@@ -270,5 +287,22 @@ void UPlacementManagerComponent::Replacement_Cancel()
 	_GridManager->ClearCellDrawing(0);
 	_SelectedPlacement = nullptr;
 
+}
+
+void UPlacementManagerComponent::RemoveBuilding(APlacementActor* toRemove)
+{
+	if (_SelectedPlacement == toRemove) {
+		_SelectedPlacement = nullptr;
+	}
+	if (_HoveredPlacement == toRemove) {
+		_HoveredPlacement = nullptr;
+	}
+
+	if (_GridManager) {
+		_GridManager->OnBuildingRemoved(toRemove);
+	}
+
+
+	toRemove->Destroy();
 }
 

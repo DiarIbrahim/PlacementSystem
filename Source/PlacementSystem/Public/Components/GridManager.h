@@ -77,8 +77,6 @@ class PLACEMENTSYSTEM_API AGridManager : public AActor
 	AGridManager();
 protected:
 
-	virtual void Tick(float DeltaTime) override;
-
 
 
 	// Componwents
@@ -133,7 +131,8 @@ public:
 	/*
 		converts location to cell
 	*/
-	FGridCell LocationToCell(APlacementActor* actorToPlace);
+
+	FGridCell LocationToCell(FVector Location);
 	/*
 		adds building to the grid for tyhe first time and reserves the reqyuired cells
 	*/
@@ -143,12 +142,26 @@ public:
 	*/
 	void ReplaceBuilding(class APlacementActor* ToPlace);
 
+	/*
+		called when a building replaced, so the already reserved cells will be freed, and new ones will be reserved
+	*/
+	void OnBuildingRemoved(class APlacementActor* ToRemove);
+
 
 	/*
-		draws cells s mesh for preview 
+		draws cells as mesh, on the grid in their proper position
+		can be used for any kind of drawing 
+		for example used it to indicate the used/reserved cells in the grid !
+
+		@param cells					list of cells to draw
+		@param meshIndex				works as an id for sectoins you are drawing (cells you are drawing)
+		@param Padding					is the padding for drawing cells (bigger the padding, smaller cell will be drawed) (please make a quick search to see how padding works)
+		@param CustomCellDrawMaterial   material used while drawing the cells (mesh)
+		@param offset					offset to be applyed to the drawing mesh	 
+
 	*/
 	UFUNCTION(BlueprintCallable)
-	void DrawCells(TArray<FGridCell> cells , int meshIndex = 1 , float Padding = 10.0f, UMaterialInterface* CustomCellDrawMaterial = nullptr);
+	void DrawCells(TArray<FGridCell> cells , int meshIndex = 1 , float Padding = 10.0f, UMaterialInterface* CustomCellDrawMaterial = nullptr , FVector offset = FVector(0,0,60));
 	/*
 		re-draws cells for a praticular building
 	*/

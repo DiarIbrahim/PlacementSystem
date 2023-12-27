@@ -122,9 +122,18 @@ public:
 		this request can be accepted declined.
 		if accpted, allows this placement actor to be moved ( snapped to mouse cursor ) and placed else where
 		returns true if accepted and false if declined
+		NOTE : the placementActor must be seected in order for this function to work
 	*/
 	UFUNCTION(BlueprintCallable)
 	bool RegisterForReplacement();
+
+	/*
+		Removes the building from the world 
+		and frees the already reserved cells so new buildings can be placed there !
+	*/
+	UFUNCTION(BlueprintCallable)
+	void RemoveBuilding();
+
 
 	/*
 		will be called when this blueprint was spawned as preview
@@ -155,6 +164,29 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, META = (DisplayName = "OnSelected"))
 	void OnSelected_BP();
 
+	/*
+		called when this actor Unselected by PlacemenManagerComponent
+	*/
+	void OnUnSelected();
+	/*
+		called when this actor Unselected by PlacemenManagerComponent
+		can be Implemented on Blueprint
+	*/
+	UFUNCTION(BlueprintImplementableEvent, META = (DisplayName = "OnUnSelected"))
+	void OnUnSelected_BP();
+
+
+
+	/*
+		called when  replacement process started by PlacemenManagerComponent
+	*/
+	void OnReplace_Started();
+	/*
+		called when  replacement process started by PlacemenManagerComponent
+		can be Implemented on Blueprint
+	*/
+	UFUNCTION(BlueprintImplementableEvent, META = (DisplayName = "OnReplace Started"))
+	void OnReplace_Started_BP();
 
 	/*
 		called when this actor replaced by PlacemenManagerComponent

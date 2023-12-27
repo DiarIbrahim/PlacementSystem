@@ -156,6 +156,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Replacement_Cancel();
 
+	/*
+		removes the given building from the world 
+		and frees the reserved cells 
+	*/
+	UFUNCTION(BlueprintCallable)
+	void RemoveBuilding(class APlacementActor* toRemove);
 
 };
 
