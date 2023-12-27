@@ -161,7 +161,7 @@ void UPlacementManagerComponent::Placement_Accept()
 	if (_previewPlacement) {
 		_previewPlacement->OnPlaced(this);
 		_GridManager->AddBuildingToGrid(_previewPlacement);
-		_GridManager->ClearDrawing();
+		_GridManager->ClearCellDrawing(0);
 		_previewPlacement = nullptr;
 	}
 
@@ -174,13 +174,10 @@ void UPlacementManagerComponent::Placement_Cancel()
 
 	if (_previewPlacement) {
 		_previewPlacement->Destroy(); 
-		_GridManager->ClearDrawing();
+		_GridManager->ClearCellDrawing(0);
 		_previewPlacement = nullptr;
 	}
 }
-
-
-
 
 
 void UPlacementManagerComponent::ApplyYawRotationToPlacement(float Yaw)
@@ -258,7 +255,7 @@ void UPlacementManagerComponent::Replacement_Accept()
 	bIsReplacing = false;
 	_SelectedPlacement->OnReplaced();
 	_GridManager->ReplaceBuilding(_SelectedPlacement);
-	_GridManager->ClearDrawing();
+	_GridManager->ClearCellDrawing(0);
 	_SelectedPlacement = nullptr;
 
 }
@@ -270,7 +267,7 @@ void UPlacementManagerComponent::Replacement_Cancel()
 	bIsReplacing = false;
 	_SelectedPlacement->SetActorTransform(_Pre_Replace_Selected_Transform);
 	_SelectedPlacement->OnReplaced();
-	_GridManager->ClearDrawing();
+	_GridManager->ClearCellDrawing(0);
 	_SelectedPlacement = nullptr;
 
 }

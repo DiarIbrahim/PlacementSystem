@@ -7,23 +7,9 @@
 
 AGridManager::AGridManager()
 {
-	PrimaryActorTick.bCanEverTick = true;
 	if (!ProceduralMesh) {
 		ProceduralMesh = CreateDefaultSubobject<UProceduralMeshComponent>(FName("mesh"));
 		ProceduralMesh->SetupAttachment(GetRootComponent());
-	}
-}
-
-float counter = 2;
-void AGridManager::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-	Print("Tick --");
-	counter -= DeltaTime;
-	if (counter <= 0) {
-		counter = 2;
-		ClearDrawing();
-		 drawCells(reservedCells);
 	}
 }
 
@@ -146,6 +132,20 @@ void AGridManager::ReplaceBuilding(APlacementActor* ToPlace)
 
 }
 
+
+FGridCell LastdrawnLocation;
+void AGridManager::RedrawPlacementCells(APlacementActor* toPlace)
+{
+
+	// check if this building in this particular location is already drawn preview cells !
+	if (LocationToCell(toPlace).IsEqual(LastdrawnLocation) && toPlace->GetBuildingId() == LastdrawnLocation.reserverBuildingId) return;
+	LastdrawnLocation = LocationToCell(toPlace);
+	LastdrawnLocation.reserverBuildingId = toPlace->GetBuildingId();
+	
+	ClearCellDrawing(0);
+	DrawCells(GetCellsNeededForBuilding(toPlace),0, grid_preview_padding ,Grid_placment_Previrew_material);
+}
+
 /*
 	data for drawing a cell
 */
@@ -173,7 +173,6 @@ struct DrawCellData {
 		return DrawCellData(vectors,tringles);
 	}
 };
-
 // data for drawing multiple cells / mesh 
 struct DrawData {
 	DrawData() {
@@ -201,36 +200,26 @@ struct DrawData {
 	}
 };
 
-
-FGridCell LastdrawnLocation;
-void AGridManager::RedrawPlacementCells(APlacementActor* toPlace)
+void AGridManager::DrawCells(TArray<FGridCell> cells , int meshIndex , float Padding , UMaterialInterface* CustomCellDrawMaterial)
 {
-
-	// check if this building in this particular location is already drawn preview cells !
-	if (LocationToCell(toPlace).IsEqual(LastdrawnLocation) && toPlace->GetBuildingId() == LastdrawnLocation.reserverBuildingId) return;
-	LastdrawnLocation = LocationToCell(toPlace);
-	LastdrawnLocation.reserverBuildingId = toPlace->GetBuildingId();
-	
-	ClearDrawing();
-	drawCells(GetCellsNeededForBuilding(toPlace));
-}
-
-void AGridManager::drawCells(TArray<FGridCell> cells)
-{
-
-	DrawData d = DrawData::MakeSetOfCells(cells, _gridSettings.GridSize, FVector(0, 0, 70), grid_preview_padding);
+	DrawData d = DrawData::MakeSetOfCells(cells, _gridSettings.GridSize, FVector(0, 0, 70), Padding);
 
 	if (ProceduralMesh) {
-		ProceduralMesh->CreateMeshSection(0, d.vectors, d.tringles, TArray<FVector>(), TArray<FVector2D>(), TArray<FColor>(), TArray<FProcMeshTangent>(), 0);
-		ProceduralMesh->SetMaterial(0, Grid_placment_Previrew_material);
+		ProceduralMesh->CreateMeshSection(meshIndex, d.vectors, d.tringles, TArray<FVector>(), TArray<FVector2D>(), TArray<FColor>(), TArray<FProcMeshTangent>(), 0);
+		ProceduralMesh->SetMaterial(meshIndex, CustomCellDrawMaterial);
 
 	}
 }
 
-void AGridManager::ClearDrawing()
+void AGridManager::ClearCellDrawing(int Meshindex , bool bAllSections)
 {
 	if (!ProceduralMesh) return;
-	ProceduralMesh->ClearAllMeshSections();
+	if (bAllSections) {
+		ProceduralMesh->ClearAllMeshSections();
+	}
+	else {
+		ProceduralMesh->ClearMeshSection(Meshindex);
+	}
 
 }
 

@@ -2,7 +2,7 @@
 
 
 #include "Actors/PlacementActor.h"
-#include "Components/SphereComponent.h"
+#include "Components/BoxComponent.h"
 #include "Components/PlacementManagerComponent.h"
 #include "placementSystem.h"
 #include "Components/GridManager.h"
@@ -19,11 +19,16 @@ APlacementActor::APlacementActor()
 	}
 	
 	if (!collision) {
-		collision = CreateDefaultSubobject<USphereComponent>(FName("Collsion"));
-		collision->SetCollisionObjectType(ECC_WorldStatic);
+		collision = CreateDefaultSubobject<UBoxComponent>(FName("Collsion"));
+		collision->SetCollisionResponseToChannel(ECC_WorldStatic , ECR_Block);
 		collision->SetupAttachment(root);
 	}
 
+	if (!Mesh) {
+		Mesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("Mesh"));
+		Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		Mesh->SetupAttachment(root);
+	}
 
 }
 
@@ -46,7 +51,9 @@ void Helper_DrawCellGizmo_DrawCell(UWorld* world , FVector Cell_StartPoint , flo
 
 void APlacementActor::DrawCellGizmo()
 {
+	// clear all drawn lines
 	GetWorld()->Exec(GetWorld(), TEXT("FlushPersistentDebugLines"));
+
 	for (size_t i = 0; i < width_Cell; i++) {
 		for (size_t j = 0; j < depth_Cell; j++) {
 			FVector startLoc = FVector(cell_size * i, cell_size * j, 0);
@@ -103,7 +110,7 @@ void APlacementActor::AnimateHover(float DeltaTime)
 			currentScale = FMath::Clamp(currentScale, hoveredScale , normalScale);
 		}
 		// set
-		SetActorScale3D(FVector(currentScale));
+		Mesh->SetWorldScale3D(FVector(currentScale));
 	}
 }
 

@@ -29,11 +29,14 @@ protected:
 	class UPlacementManagerComponent* PlacementComponent;
 
 
-	// Components
-	UPROPERTY(BlueprintReadWrite , EditAnywhere)
-	class USphereComponent* collision;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class USceneComponent* root;
+	// Components
+	UPROPERTY(BlueprintReadWrite , EditAnywhere)
+	class UBoxComponent* collision;
+	// Components
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	class UStaticMeshComponent* Mesh;
 
 
 	FGuid BuildingId;

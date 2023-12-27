@@ -88,19 +88,23 @@ protected:
 
 	//  a reference to placementManagerComponent
 	UPlacementManagerComponent* _placementManager;
+	
 	// settings for this grid 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, category = "grid Settings ")
 	FGridSettingsData _gridSettings;
 
 	// all cells reserved by buildings
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, category = "grid Settings | Cells")
 	TArray<FGridCell> reservedCells;
 
 	/*
 		material used for preview cells
 	*/
-	UPROPERTY(BlueprintReadWrite, EditAnywhere , category = "grid Settings")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere , category = "grid Settings ")
 	UMaterialInterface* Grid_placment_Previrew_material; 
+
 	// the padding for grid preview (0 the preview will fill the entir grid, otherwise adds padding)
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, category = "grid Settings")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, category = "grid Settings ")
 	float grid_preview_padding = 10;
 
 
@@ -143,12 +147,14 @@ public:
 	/*
 		draws cells s mesh for preview 
 	*/
-	void drawCells(TArray<FGridCell> cells);
+	UFUNCTION(BlueprintCallable)
+	void DrawCells(TArray<FGridCell> cells , int meshIndex = 1 , float Padding = 10.0f, UMaterialInterface* CustomCellDrawMaterial = nullptr);
 	/*
 		re-draws cells for a praticular building
 	*/
 	void RedrawPlacementCells(class APlacementActor* ToPlace);
+	UFUNCTION(BlueprintCallable)
 	// clears already drawn cells
-	void ClearDrawing();
+	void ClearCellDrawing(int meshIndex, bool bAllSections = false);
 
 };
