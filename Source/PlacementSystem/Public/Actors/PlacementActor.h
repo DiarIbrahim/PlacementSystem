@@ -29,13 +29,13 @@ protected:
 	class UPlacementManagerComponent* PlacementComponent;
 
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Placement System")
 	class USceneComponent* root;
 	// Components
-	UPROPERTY(BlueprintReadWrite , EditAnywhere)
+	UPROPERTY(BlueprintReadWrite , EditAnywhere, Category = "Placement System")
 	class UBoxComponent* collision;
 	// Components
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Placement System")
 	class UStaticMeshComponent* Mesh;
 
 
@@ -124,14 +124,14 @@ public:
 		returns true if accepted and false if declined
 		NOTE : the placementActor must be seected in order for this function to work
 	*/
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Placement System")
 	bool RegisterForReplacement();
 
 	/*
 		Removes the building from the world 
 		and frees the already reserved cells so new buildings can be placed there !
 	*/
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Placement System")
 	void RemoveBuilding();
 
 
@@ -140,7 +140,7 @@ public:
 		this object may not be spawned !
 		can be Implemented on Blueprint 
 	*/
-	UFUNCTION(BlueprintImplementableEvent , META = (DisplayName = "OnPreviewPlacement"))
+	UFUNCTION(BlueprintImplementableEvent , META = (DisplayName = "OnPreviewPlacement"), Category = "Placement System")
 	void OnPreviewPlacement_BP();
 	/*
 		called When this actor placed on world
@@ -150,7 +150,7 @@ public:
 		called When this actor placed on world
 		can be Implemented on Blueprint 
 	*/
-	UFUNCTION(BlueprintImplementableEvent, META = (DisplayName = "OnPlaced"))
+	UFUNCTION(BlueprintImplementableEvent, META = (DisplayName = "OnPlaced"), Category = "Placement System")
 	void OnPlaced_BP();
 
 	/*
@@ -161,7 +161,7 @@ public:
 		called when this actor selected by PlacemenManagerComponent
 		can be Implemented on Blueprint
 	*/
-	UFUNCTION(BlueprintImplementableEvent, META = (DisplayName = "OnSelected"))
+	UFUNCTION(BlueprintImplementableEvent, META = (DisplayName = "OnSelected"), Category = "Placement System")
 	void OnSelected_BP();
 
 	/*
@@ -172,7 +172,7 @@ public:
 		called when this actor Unselected by PlacemenManagerComponent
 		can be Implemented on Blueprint
 	*/
-	UFUNCTION(BlueprintImplementableEvent, META = (DisplayName = "OnUnSelected"))
+	UFUNCTION(BlueprintImplementableEvent, META = (DisplayName = "OnUnSelected"), Category = "Placement System")
 	void OnUnSelected_BP();
 
 
@@ -185,7 +185,7 @@ public:
 		called when  replacement process started by PlacemenManagerComponent
 		can be Implemented on Blueprint
 	*/
-	UFUNCTION(BlueprintImplementableEvent, META = (DisplayName = "OnReplace Started"))
+	UFUNCTION(BlueprintImplementableEvent, META = (DisplayName = "OnReplace Started"), Category = "Placement System")
 	void OnReplace_Started_BP();
 
 	/*
@@ -196,7 +196,7 @@ public:
 		called when this actor replaced by PlacemenManagerComponent
 		can be Implemented on Blueprint
 	*/
-	UFUNCTION(BlueprintImplementableEvent, META = (DisplayName = "OnReplaced"))
+	UFUNCTION(BlueprintImplementableEvent, META = (DisplayName = "OnReplaced"), Category = "Placement System")
 	void OnReplaced_BP();
 
 
@@ -209,7 +209,7 @@ public:
 		called when this actor Hovered by PlacemenManagerComponent
 		can be Implemented on Blueprint
 	*/
-	UFUNCTION(BlueprintImplementableEvent, META = (DisplayName = "OnHovered"))
+	UFUNCTION(BlueprintImplementableEvent, META = (DisplayName = "OnHovered"), Category = "Placement System")
 	void OnHovered_BP();
 
 
@@ -221,7 +221,7 @@ public:
 		called when this actor UnHovered by PlacemenManagerComponent
 		can be Implemented on Blueprint
 	*/
-	UFUNCTION(BlueprintImplementableEvent, META = (DisplayName = "OnUnHovered"))
+	UFUNCTION(BlueprintImplementableEvent, META = (DisplayName = "OnUnHovered"), Category = "Placement System")
 	void OnUnHovered_BP();
 
 	/*
@@ -238,12 +238,12 @@ public:
 	*/
 	void OnPlacementProcessValidation(float DeltaTime, bool bCanPlaceInCurrentLocation , bool bIsFirstSpwan);
 
-	UFUNCTION(BlueprintImplementableEvent, META = (DisplayName = "OnPlacementProcessValidation"))
+	UFUNCTION(BlueprintImplementableEvent, META = (DisplayName = "OnPlacementProcessValidation"), Category = "Placement System")
 	void OnPlacementProcessValidation_BP(float DeltaTime, bool bCanPlaceInCurrentLocation, bool bIsFirstSpwan);
 
 
 
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(BlueprintPure, Category = "Placement System")
 	FGuid GetBuildingId() const { return BuildingId; }
 
 

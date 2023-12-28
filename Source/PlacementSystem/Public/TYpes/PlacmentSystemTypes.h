@@ -29,24 +29,24 @@ struct FPlacementData {
 	/*
 		the item needed to be placed in the world 
 	*/
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Placement System")
 	TSubclassOf<APlacementActor> ActorToPlace;
 	/*
 		whether to align th ebuilding to the normal of the surface or keep it facing Up Axis (Z)
 	*/
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Placement System")
 	bool bAlignToSurfaceNormal = true;
 
 	/*
 		the positional offset to be applyed to the placement actor
 	*/
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Placement System")
 	FVector LocationOffset;
 
 	/*
 		whether to apply grid rule to location, the building can not be placed freely, it will snap to certain points based on grid settings
 	*/
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Placement System")
 	bool bApplyGridRules = true;
 
 
@@ -65,13 +65,13 @@ struct FGridSettingsData {
 	/*
 		size (x,y) of the grids ( in cm )
 	*/
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Placement System")
 	double GridSize = 100;
 	
 	/*
 		whether to snap the location to the center of the cell rather than corner of the grid cell
 	*/
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Placement System")
 	bool bSnapToGridCellCenter = false;
 
 

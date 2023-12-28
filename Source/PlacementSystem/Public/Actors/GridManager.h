@@ -27,9 +27,9 @@ public:
 	}
 
 	// x and y index of cells
-	UPROPERTY(BlueprintReadWrite , EditAnywhere);
+	UPROPERTY(BlueprintReadWrite , EditAnywhere, Category = "Placement System");
 	int32 x;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere);
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Placement System");
 	int32 y;
 
 	FGuid reserverBuildingId;
@@ -84,7 +84,7 @@ protected:
 
 
 	// Componwents
-	 UPROPERTY(BlueprintReadWrite, EditAnywhere )
+	 UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Placement System")
 	// for generating custom meshes in runtime
 	class UProceduralMeshComponent* ProceduralMesh;
 
@@ -135,7 +135,7 @@ public:
 	/*
 		converts location to cell
 	*/
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Placement System")
 	FGridCell LocationToCell(FVector Location);
 	/*
 		adds building to the grid for tyhe first time and reserves the reqyuired cells
@@ -164,13 +164,13 @@ public:
 		@param offset					offset to be applyed to the drawing mesh	 
 
 	*/
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Placement System")
 	void DrawCells(TArray<FGridCell> cells , int meshIndex = 1 , float Padding = 10.0f, UMaterialInterface* CustomCellDrawMaterial = nullptr , FVector offset = FVector(0,0,60));
 	/*
 		re-draws cells for a praticular building
 	*/
 	void RedrawPlacementCells(class APlacementActor* ToPlace);
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Placement System")
 	// clears already drawn cells
 	void ClearCellDrawing(int meshIndex, bool bAllSections = false);
 

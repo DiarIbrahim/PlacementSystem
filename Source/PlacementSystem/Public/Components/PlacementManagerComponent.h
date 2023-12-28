@@ -82,7 +82,7 @@ public:
 		returns transform under the cursor 
 		applys grid rules acording to @GridSettings	
 	*/
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable , Category = "Placement Component")
 	bool GetUnderCursorTrans(FTransform& UnderCursorLoc);
 
 
@@ -101,20 +101,20 @@ public:
 	/*
 		can be called to start placing the passed static mesh ( @mesh ) to the world !
 	*/
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Placement System")
 	void Placement_Start(struct FPlacementData Data);
 
 	/*
 		this can be called to cancel placement process (if already started)
 	*/
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Placement System")
 	void Placement_Cancel();
 
 	/*
 		this can be called to verify and accept placement process (if already started)
 		this request will be ignored if the the placment conditions does not match !
 	*/
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Placement System")
 	void Placement_Accept();
 
 	/*
@@ -122,7 +122,7 @@ public:
 		so please call it when you see the preview of the placement mesh
 
 	*/
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Placement System")
 	void ApplyYawRotationToPlacement(float Yaw);
 
 	/*
@@ -134,33 +134,33 @@ public:
 	/*
 		selects currently hovered item (Of Type PlacementActor)
 	*/
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Placement System")
 	void SelectUnderCursor();
 
 		
 	/*
 		to start replacing an already placed/spawned building
 	*/
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Placement System")
 	bool Replacement_Start(class APlacementActor* building);
 
 	/*
 		to accept the replacement process and place the currently selected building in proper position
 	*/
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Placement System")
 	void Replacement_Accept();
 
 	/*
 		to reject the replacement process and place the currently selected building to its original transform
 	*/
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Placement System")
 	void Replacement_Cancel();
 
 	/*
 		removes the given building from the world 
 		and frees the reserved cells 
 	*/
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Placement System")
 	void RemoveBuilding(class APlacementActor* toRemove);
 
 };
