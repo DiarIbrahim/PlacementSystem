@@ -22,17 +22,14 @@ void AGridManager::Init(UPlacementManagerComponent* _Owner)
 
 void AGridManager::SetGridSettingsData(FGridSettingsData data)
 {
-	if (data.bApplyGrid) {
-		_gridSettings = data;
-	}
-	
+	_gridSettings = data;
+
 }
 
 
 
 void AGridManager::ApplyGridSettings(FTransform& transform )
 {
-	if (!_gridSettings.bApplyGrid) return;
 
 	FVector location = transform.GetLocation();
 	int32 XCells = location.X / _gridSettings.GridSize;

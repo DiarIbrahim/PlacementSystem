@@ -74,12 +74,6 @@ struct FGridSettingsData {
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	bool bSnapToGridCellCenter = false;
 
-	/*
-		whether to apply the grid or not 
-	*/
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	bool bApplyGrid = true;
-
 
 };
 

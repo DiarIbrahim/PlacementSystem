@@ -26,16 +26,15 @@ void UPlacementManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (GridSettings.bApplyGrid) {
 		if (CustomGridClass) {
 			_GridManager = GetWorld()->SpawnActor<AGridManager>(CustomGridClass);
+			_GridManager->Init(this);
 		}
 		else {
 			_GridManager = GetWorld()->SpawnActor<AGridManager>();
+			_GridManager->Init(this);
+			_GridManager->SetGridSettingsData(GridSettings);
 		}
-		_GridManager->Init(this);
-		_GridManager->SetGridSettingsData(GridSettings);
-	}
 
 }
 
@@ -88,7 +87,9 @@ bool UPlacementManagerComponent::GetUnderCursorTrans(FTransform& UnderCursorTran
 		if (GetPlayerController()->GetHitResultUnderCursor(ECC_Camera, 0, h)) {
 			UnderCursorTrans.SetLocation(h.ImpactPoint);
 
-			_GridManager->ApplyGridSettings(UnderCursorTrans);
+			if (_GridManager) {
+				 _GridManager->ApplyGridSettings(UnderCursorTrans);
+			}
 
 			if (CurrentPlacementData.bAlignToSurfaceNormal) {
 				UnderCursorTrans.SetRotation(UKismetMathLibrary::MakeRotFromZX(h.ImpactNormal , FVector::ForwardVector).Quaternion());
@@ -147,6 +148,11 @@ void UPlacementManagerComponent::Placement_Start(FPlacementData data)
 {
 	if (bstartPlacing) return;
 
+	// unselect already selected placment
+	if (_SelectedPlacement) {
+		_SelectedPlacement->OnUnSelected();
+		_SelectedPlacement = nullptr;
+	}
 
 	CurrentPlacementData = data;
 	if (!_previewPlacement) {
