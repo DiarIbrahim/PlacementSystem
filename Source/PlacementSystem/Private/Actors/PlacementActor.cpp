@@ -5,7 +5,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/PlacementManagerComponent.h"
 #include "placementSystem.h"
-#include "Components/GridManager.h"
+#include "Actors/GridManager.h"
 
 // Sets default values
 APlacementActor::APlacementActor()
@@ -21,6 +21,7 @@ APlacementActor::APlacementActor()
 	if (!collision) {
 		collision = CreateDefaultSubobject<UBoxComponent>(FName("Collsion"));
 		collision->SetCollisionResponseToChannel(ECC_WorldStatic , ECR_Block);
+		collision->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 		collision->SetupAttachment(root);
 	}
 
@@ -176,5 +177,13 @@ void APlacementActor::OnUnHovered()
 
 	bIsHovered = false;
 	OnUnHovered_BP();
+}
+
+void APlacementActor::OnPlacementProcessValidation(float DeltaTime, bool bCanPlaceInCurrentLocation , bool bIsFirstTime)
+{
+	// do cpp implementation !
+
+	// call bp
+	OnPlacementProcessValidation_BP(DeltaTime,bCanPlaceInCurrentLocation, bIsFirstTime);
 }
 

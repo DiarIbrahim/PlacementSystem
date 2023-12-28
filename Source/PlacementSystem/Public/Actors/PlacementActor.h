@@ -224,6 +224,24 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, META = (DisplayName = "OnUnHovered"))
 	void OnUnHovered_BP();
 
+	/*
+		this will be called when ever this building is on placing/replacing process
+		and passes a boolean that determines if the current position is valid or not
+		in an other word @bCanPlaceInCurrentLocation is true then the building can be placed at that particular location other wise it cant be placed there !
+		
+		this function will be called every frame !
+
+		@param DeltaTime                   deltatime  of the world
+		@param bCanPlaceInCurrentLocation  is it valid to place the building at thelocation
+		@param bIsFirstSpwan               whether it is first time placement(first spawn) or replacement
+
+	*/
+	void OnPlacementProcessValidation(float DeltaTime, bool bCanPlaceInCurrentLocation , bool bIsFirstSpwan);
+
+	UFUNCTION(BlueprintImplementableEvent, META = (DisplayName = "OnPlacementProcessValidation"))
+	void OnPlacementProcessValidation_BP(float DeltaTime, bool bCanPlaceInCurrentLocation, bool bIsFirstSpwan);
+
+
 
 	UFUNCTION(BlueprintPure)
 	FGuid GetBuildingId() const { return BuildingId; }

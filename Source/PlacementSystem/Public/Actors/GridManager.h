@@ -27,7 +27,11 @@ public:
 	}
 
 	// x and y index of cells
-	int32 x, y;
+	UPROPERTY(BlueprintReadWrite , EditAnywhere);
+	int32 x;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere);
+	int32 y;
+
 	FGuid reserverBuildingId;
 
 	//static bool operator== (const FGridCell& A , const FGridCell& B) {
@@ -131,7 +135,7 @@ public:
 	/*
 		converts location to cell
 	*/
-
+	UFUNCTION(BlueprintCallable)
 	FGridCell LocationToCell(FVector Location);
 	/*
 		adds building to the grid for tyhe first time and reserves the reqyuired cells

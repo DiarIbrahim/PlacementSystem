@@ -5,7 +5,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "Actors/PlacementActor.h"
-#include "Components/GridManager.h"
+#include "Actors/GridManager.h"
 #include "PlacementSystem.h"
 
 
@@ -85,7 +85,7 @@ bool UPlacementManagerComponent::GetUnderCursorTrans(FTransform& UnderCursorTran
 {
 	if (GetPlayerController()) {
 		FHitResult h;
-		if (GetPlayerController()->GetHitResultUnderCursor(ECC_Visibility, 0, h)) {
+		if (GetPlayerController()->GetHitResultUnderCursor(ECC_Camera, 0, h)) {
 			UnderCursorTrans.SetLocation(h.ImpactPoint);
 
 			_GridManager->ApplyGridSettings(UnderCursorTrans);
@@ -104,7 +104,7 @@ bool UPlacementManagerComponent::GetUnderCursorTrans(FTransform& UnderCursorTran
 	return false;
 }
 
-void UPlacementManagerComponent::UpdatePreviewMewsh(FTransform PlacementTransform)
+void UPlacementManagerComponent::UpdatePreviewMewsh( FTransform PlacementTransform)
 {
 	// already spawned  just re possition it
 	if (_previewPlacement && bstartPlacing) {
@@ -116,13 +116,15 @@ void UPlacementManagerComponent::UpdatePreviewMewsh(FTransform PlacementTransfor
 		 PlacementTransform.SetRotation(rot.Quaternion());
 		_previewPlacement->SetActorTransform(PlacementTransform);
 
+
+
+		// update placement State
 		if (_GridManager && _previewPlacement) {
 			if (_GridManager->CanAddBuildingToGrid(_previewPlacement)) {
-				Print("Yes Can add !" , 12121);
+				_previewPlacement->OnPlacementProcessValidation(GetWorld()->GetDeltaSeconds() ,true , 1);
 			}
 			else {
-				Print("NO Can't add !", 12121);
-
+				_previewPlacement->OnPlacementProcessValidation(GetWorld()->GetDeltaSeconds(), false, 1);
 			}
 		}
 
@@ -133,6 +135,12 @@ void UPlacementManagerComponent::UpdateSelectedForReplacement(FTransform Placeme
 {
 	if (_SelectedPlacement && bIsReplacing) {
 		_SelectedPlacement->SetActorTransform(PlacementTransform);
+		if (_GridManager->CanAddBuildingToGrid(_SelectedPlacement)) {
+			_SelectedPlacement->OnPlacementProcessValidation(GetWorld()->GetDeltaSeconds(), true, 0);
+		}
+		else {
+			_SelectedPlacement->OnPlacementProcessValidation(GetWorld()->GetDeltaSeconds(), false, 0);
+		}
 	}
 }
 void UPlacementManagerComponent::Placement_Start(FPlacementData data)
@@ -152,7 +160,6 @@ void UPlacementManagerComponent::Placement_Start(FPlacementData data)
 void UPlacementManagerComponent::Placement_Accept()
 {
 	if (!bstartPlacing || !_GridManager || !_GridManager->CanAddBuildingToGrid(_previewPlacement)) {
-		Print("failed to accept !");
 		Placement_Cancel();
 		return;
 	}

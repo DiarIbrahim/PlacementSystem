@@ -1,7 +1,7 @@
 // Developed by Diar Games    twitter :  https://twitter.com/diar__Ibrahim      github : https://github.com/DiarIbrahim
 
 
-#include "Components/GridManager.h"
+#include "Actors/GridManager.h"
 #include "ProceduralMeshComponent.h"
 #include "PlacementSystem.h"
 
@@ -155,7 +155,7 @@ void AGridManager::RedrawPlacementCells(APlacementActor* toPlace)
 	LastdrawnLocation.reserverBuildingId = toPlace->GetBuildingId();
 	
 	ClearCellDrawing(0);
-	DrawCells(GetCellsNeededForBuilding(toPlace),0, grid_preview_padding ,Grid_placment_Previrew_material);
+	DrawCells(GetCellsNeededForBuilding(toPlace),0, grid_preview_padding ,Grid_placment_Previrew_material, FVector(0,0,toPlace->GetActorLocation().Z + 2));
 }
 
 /*
