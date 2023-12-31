@@ -1,78 +1,86 @@
-**Placement System Plugin for Unreal Engine (C++ Code Plugin)**
 
-A code plugin that allows very basic city building  functionallities .
+<H1>Placement System Plugin for Unreal Engine (C++ Code Plugin)</H1>
 
-**Contains** :
+<a href= "https://youtu.be/I7V5zLQfhk8"> Watch tutorial on youtube here !<a/>
 
-1-**PlacementManagerComponent** : A component that allows comunication to the system (e.g placing objects, replacing and checking for selection)
+A code plugin that allows very basic city building  functionallities.
 
-2-**PlacmentActor** : an actor that can be spawned to the scene by **PlacementManagerComponent**  
+<h2>Contains:</h2>
+<ul>
+    <li> <b> PlacementManagerComponent</b> : A component that allows comunication to the system (e.g placing objects, replacing and checking for selection) </li>
+    <li> <b>PlacmentActor </b>: an actor that can be spawned to the scene by PlacementManagerComponent  </li>
+    <li> <b>GridManager</b> : an Actor that is responsible for grid and reserve system (so two objects can not be plcaed at the same place at the same time)</li>
+</ul>
 
-3-**GridManager** : an Actor that is responsible for grid and reserve system (so two objects can not be plcaed at the same place at the same time)
 
 
 --------------------------------------------------------------
-**PlacementManagerComponent**
 
-1- placement (the act of adding an object to the scene ) proccess simplified into 3 steps
-    - Start Placement  (function name : Placement_Start )
-        starts the placement process takes in an actor (PlacementActor).
-    - Accept Placement (function name : Placement_Accept ).
-        places the actor that been taken in Placement start and places in the currrent location and finishes the placement process. 
-    - Cancel Placement (function name : Placement_Cancel ).
-        cancels the placement process.
 
-2- Replacement (the acto of re-positioning an object that already spawned to the scene)
-    - Start Replacement  (function name : Replacement_Start )
-        starts the placement process takes in an actor (PlacementActor) and starts to replace that actor.
-    - Accept Replacement (function name : Replacement_Accept ).
-        places the actor that been taken in Replacement start and places in the currrent location and finishes the placement process. 
-    - Cancel Replacement (function name : Replacement_Cancel ).
-        places the actor that been taken in Replacement start to its original locatio and cancels the Replacement proces.
+<H2>PlacementManagerComponent</H2>
+the main component that can be added to the player and it is the main way to comunicate with the system.
 
-3- Select (select actors under the mouse cursor and calls OnSelected function for the actor)
-    - SelectUnderCursor() is a function that selects actor under the cursor and calls OnSelected for the actor, and unselects the already selceted ons (calls OnUnselected for that actor) 
+<h3>Placment</h3>
+the process of adding an object to the scene,
+proccess simplified into 3 steps (functions):
+<ul>
+    <li> <b>Placement_Start()</b> :  starts the placement process takes in an actor (PlacementActor).</li>
+    <li> <b>Placement_Accept() </b>:  places the actor that been taken in Placement start and places in the currrent location and finishes the placement process.   </li>
+    <li> <b>Placement_Cancel()</b> : cancels the placement process.</li>
+</ul>
+
+<h3>Replacment</h3>
+the process of re-positioning an object that already spawned to the scene
+proccess simplified into 3 steps (functions):
+<ul>
+    <li> <b>Replacement_Start()</b> :  starts the Replacement process takes in an actor (PlacementActor) and starts to replace that actor.</li>
+    <li> <b>Replacement_Accept() </b>:  places the actor that been taken in Replacement start and places in the currrent location and finishes the Replacement process.    </li>
+    <li> <b> places the actor that been taken in Replacement start to its original locatio and cancels the Replacement proces.</li>
+</ul>
+
+<h3>Select</h3>
+Act of Selecting the actor under the cursor :
+
+<ul>
+    <li> <b>SelectUnderCursor()</b> :  is a function that selects actor under the cursor and calls OnSelected for the actor, and unselects the already selceted ons (calls OnUnselected for that actor).</li>
+</ul>
 
 
 -------------------------------------------------------
-**PlacementActor**
+<h2>PlacementActor</h2>
 
 An actor that can be placed to the scene by PlacementManagerComponent.
 
-**--Functions--**
+<h3>Functions</h3>
+<ul>
+    <li> <b> RegisterForReplacement()</b> </li>
+    <li> <b>RemoveBuilding() </b></li>
 
-**RegisterForReplacement**()
+</ul>
 
-**RemoveBuilding**()
+<h3>Calllback Functions</h3>
+<ul>
+    <li> <b> OnPreviewPlacement()</b> : called when the actor is spawned to the scene(called on placment_start for the actor) and not yet accepted (placment_accept() not yet called for the actor </li>
+    <li> <b> OnPlaced() </b> : called when the actor spawned (called for actor when Placement_accept called</li>
+    <li> <b> OnHover() </b> : Called when the actor hovered by the mouse </li>
+    <li> <b> OnUnhover() </b> : Called when the actor unhovered</li>
+    <li> <b> OnSelected() </b> : called when the the actor selected</li>
+    <li> <b> OnUnselected() </b> : called when this actor is un selected </li>
+    <li> <b> OnPlacementPorcessValidation() </b> : called on tick() for validating the current location in both Placement and replacement processes</li>
+    <li> <b> OnReplacement_Start() </b> : called when replacement process started for this actor </li>
+    <li> <b> OnReplaced() </b> : called when the replacement process is finished for this actor (called for both Replacement_accept and Replacement_cancel )</li>
 
-
-****--Calllback functions--****
-
-**OnPreviewPlacement**()           :: called when the actor is spawned to the scene(called on placment_start for the actor) and not yet accepted (placment_accept() not yet called for the actor)
-
-**OnPlaced**()                     :: called when the actor spawned (called for actor when Placement_accept called )
-
-**OnHover**()                      :: Called when the actor hovered by the mouse
-
-**OnUnhover**()                    :: Called when the actor unhovered
-
-**OnSelected**()                   :: called when the the actor selected 
-
-**OnUnselected**()                 :: called when this actor is un selected 
-
-**OnPlacementPorcessValidation**() :: called on tick() for validating the current location in both Placement and replacement processes.
-
-**OnReplacement_Start**()          :: called when replacement process started for this actor 
-
-**OnReplaced**()                   :: called when the replacement process is finished for this actor (called for both Replacement_accept and Replacement_cancel )
+</ul>
 
 
 -----------------------------------------------
-**GridManager**
+<h2>GridManager</h2>
 
-an Actor that is responsible for grid and 
+An Actor that is responsible for grid and reserving places to actors so two actors can not be positioned at the same place at the same time (one cells can not be reserved more than one PlacementActor)
+
+<h3>Functions</h3>
+<ul>
+    <li> <b> DrawCells()</b> : draws cells </li>
+</ul>
 
 
-**--functions--**
-
-**DrawCells**() : draws cells 
